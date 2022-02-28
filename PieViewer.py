@@ -6,72 +6,70 @@ import random
 
 class PieViewer:
 
-    def __init__(self, initial):
-        self.moleculeDictionary = {"ultra coarse" : self.randomIncrement(initial),
-                                   "extremely coarse" : self.randomIncrement(initial),
-                                   "very coarse" : self.randomIncrement(initial),
-                                   "coarse" : self.randomIncrement(initial),
-                                   "medium" : self.randomIncrement(initial),
-                                   "fine" : self.randomIncrement(initial),
-                                   "very fine" : self.randomIncrement(initial),
-                                   "extremely fine" : self.randomIncrement(initial)}
+    def __init__(self):
+        self.sprayDictionary = {"ultra coarse" : 0,
+                                "extremely coarse" : 0,
+                                "very coarse" : 0,
+                                "coarse" : 0,
+                                "medium" : 0,
+                                "fine" : 0,
+                                "very fine" : 0,
+                                "extremely fine" : 0}
 
-    # Function: adds a random number to increment/decrement the current value of
-    #           a pesticide spray distribution
-    def randomIncrement(self, start):
-        randNumPos = random.randint(0, 10)
-        randNumNeg = random.randint(0, 10)
-        if (start <= randNumNeg):          # Prevent a negative number
-            return start + randNumPos
-        elif (1 == random.randint(0,1)):
-            return start + randNumPos
-        else:
-            return start - randNumNeg
 
-    def randomUpdateDictionary(self):
-        pass
 
     def getDictionary(self):
-        return self.moleculeDictionary
+        return self.sprayDictionary
+
+    def getLength(self):
+        return len(self.sprayDictionary)
 
 
 ## Entry point into the program ##
-pieViewer = PieViewer(30)
+pieViewer = PieViewer()
+sprayDictionary = pieViewer.getDictionary()
 
-moleculeDictionary = pieViewer.getDictionary()
+file = open("sprayDataset.txt", "r")
+fileLine = file.readline()
+
 
 pieLabels = ["Ultra coarse","Extremely coarse",
              "Very coarse","Coarse",
              "Medium","Fine","Very fine",
              "Extremely fine"]
 
-pieColors = ["pink","blue","red","purple",
-            "green","orange","gray","yellow"]
+pieColors = ["skyblue","pink","mediumpurple","forestgreen",
+            "firebrick","darkorange","slategray","royalblue"]
 
-#sliceExlpode = (0,0,0.07,0,0,0,0,0)
+while fileLine:
+    print(fileLine, end='')
+    splitString = fileLine.split(" ")
+    sprayDictionary.update({"ultra coarse": int(splitString[0])})
+    sprayDictionary.update({"extremely coarse": int(splitString[1])})
+    sprayDictionary.update({"very coarse": int(splitString[2])})
+    sprayDictionary.update({"coarse": int(splitString[3])})
+    sprayDictionary.update({"medium": int(splitString[4])})
+    sprayDictionary.update({"fine": int(splitString[5])})
+    sprayDictionary.update({"very fine": int(splitString[6])})
+    sprayDictionary.update({"extremely fine": int(splitString[7])})
 
-# Display pie chart of changes in molecule distribution continuously
-for i in range(15):
-    for key in moleculeDictionary:
-        keyValue = moleculeDictionary.get(key)
-        randomIncValue = pieViewer.randomIncrement(keyValue)
-        moleculeDictionary.update({key : randomIncValue})
-
-    moleculeDataset = np.array([moleculeDictionary.get("ultra coarse"),
-                               moleculeDictionary.get("extremely coarse"),
-                               moleculeDictionary.get("very coarse"),
-                               moleculeDictionary.get("coarse"),
-                               moleculeDictionary.get("medium"),
-                               moleculeDictionary.get("fine"),
-                               moleculeDictionary.get("very fine"),
-                               moleculeDictionary.get("medium")])
-    print(moleculeDictionary)
+    sprayDataset = np.array([sprayDictionary.get("ultra coarse"),
+                              sprayDictionary.get("extremely coarse"),
+                                sprayDictionary.get("very coarse"),
+                                sprayDictionary.get("coarse"),
+                                sprayDictionary.get("medium"),
+                                sprayDictionary.get("fine"),
+                               sprayDictionary.get("very fine"),
+                                sprayDictionary.get("extremely fine")])
+    fileLine = file.readline()
 
     plt.title("Spray Quality")
-    plt.pie(moleculeDataset, labels = pieLabels, shadow = True, startangle = 90,
+    plt.pie(sprayDataset, labels = pieLabels, shadow = True, startangle = 90,
             colors = pieColors, autopct='%.0f%%')
     plt.legend(bbox_to_anchor=(1.05, 1.05), title = "Legend", fontsize = 'xx-small',
                shadow = True)
     plt.show(block=False)     # Allow for piechart window to be closed
-    plt.pause(.05)            # Update rate
+    plt.pause(.01)            # Update rate
     plt.clf()                 # Refresh pichart
+
+file.close
