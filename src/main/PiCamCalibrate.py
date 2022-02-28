@@ -12,6 +12,6 @@ camera.start_preview()
 
 sleep(2000)
 try:
-    camera.capture('images/foo.jpg') #Captures image and saves to path
+    camera.capture('../../images/foo.jpg') #Captures image and saves to path
 finally:
     camera.close()

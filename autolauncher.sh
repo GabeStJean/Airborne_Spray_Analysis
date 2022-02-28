@@ -1,3 +1,3 @@
 #! /bin/bash
 
-python3 src/PiCamCalibrate.py
+python3 src/main/PiCamCalibrate.py
