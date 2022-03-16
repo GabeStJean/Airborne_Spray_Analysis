@@ -1,5 +1,8 @@
 import random
 
+# This program generates a dummy dataset of the amount of the distribution of the various
+# types of pesticide spray particles.
+
 class GenerateSprayDataset:
     def __init__(self, initial):
         self.sprayDictionary = {"ultra coarse" : self.randomIncrement(initial),
