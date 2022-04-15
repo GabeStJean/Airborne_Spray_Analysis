@@ -23,6 +23,8 @@ class PieViewer:
         self.pieColors = ["skyblue","pink","mediumpurple","darkorange",
             "forestgreen","yellow","darkviolet","royalblue"]
 
+        self.pieExplode = [0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0]
 
     def getDictionary(self):
         return self.sprayDictionary
@@ -30,8 +32,34 @@ class PieViewer:
     def getLength(self):
         return len(self.sprayDictionary)
 
+    def updateExplodeList(self, vmd):
+        if vmd == "Ultra Coarse": # In microns
+            self.pieExplode = [0.12, 0.0, 0.0, 0.0,
+                               0.0, 0.0, 0.0, 0.0]
+        elif vmd == "Extremely Coarse":
+            self.pieExplode = [0.0, 0.12, 0.0, 0.0,
+                               0.0, 0.0, 0.0, 0.0]
+        elif vmd == "Very Coarse":
+            self.pieExplode = [0.0, 0.0, 0.12, 0.0,
+                               0.0, 0.0, 0.0, 0.0]
+        elif vmd == "Coarse":
+            self.pieExplode = [0.0, 0.0, 0.0, 0.12,
+                               0.0, 0.0, 0.0, 0.0]
+        elif vmd == "Medium":
+            self.pieExplode = [0.0, 0.0, 0.0, 0.0,
+                               0.12, 0.0, 0.0, 0.0]
+        elif vmd == "Fine":
+            self.pieExplode = [0.0, 0.0, 0.0, 0.0,
+                               0.0, 0.12, 0.0, 0.0]
+        elif vmd == "Very Fine":
+            self.pieExplode = [0.0, 0.0, 0.0, 0.0,
+                               0.0, 0.0, 0.12, 0.0]
+        else: # Extremely Fine
+            self.pieExplode = [0.0, 0.0, 0.0, 0.0,
+                               0.0, 0.0, 0.0, 0.12]
+        return self.pieExplode
+
     def readFile(self, filePath):
-        self.sprayDictionary
         file = open(filePath)
         fileLine = file.readline()
         while fileLine:
@@ -45,7 +73,12 @@ class PieViewer:
             self.sprayDictionary.update({"fine": int(splitString[5])})
             self.sprayDictionary.update({"very fine": int(splitString[6])})
             self.sprayDictionary.update({"extremely fine": int(splitString[7])})
+            try:
+                vmdValue = splitString[8].strip()
+            except:
+                vmdValue = ""
             print(self.sprayDictionary)
+            # Update the values read by the pie chart
             sprayDataset = np.array([self.sprayDictionary.get("ultra coarse"),
                                      self.sprayDictionary.get("extremely coarse"),
                                      self.sprayDictionary.get("very coarse"),
@@ -55,11 +88,14 @@ class PieViewer:
                                      self.sprayDictionary.get("very fine"),
                                      self.sprayDictionary.get("extremely fine")])
             fileLine = file.readline()
-            plt.title("Spray Quality")
+            plt.rcParams["figure.figsize"] = (10, 5)
+            plt.title("$\\bf{Spray Quality}$")
+            self.updateExplodeList(vmdValue)
             plt.pie(sprayDataset, labels = self.pieLabels, shadow = True, startangle = 90,
-                    colors = self.pieColors, autopct='%.0f%%')
-            plt.legend(bbox_to_anchor=(1.05, 1.05), title = "Legend", fontsize = 'xx-small',
+                    colors = self.pieColors, autopct ='%.0f%%', explode = self.pieExplode )
+            plt.legend(bbox_to_anchor=(1.05, 1.05), title = "$\\bf{Legend}$", fontsize = 'medium',
                        shadow = True)
+
             plt.show(block=False)     # Allow for piechart window to be closed
             plt.pause(.01)            # Update rate
             plt.clf()                 # Refresh pichart
@@ -69,4 +105,5 @@ class PieViewer:
 
 ## Entry point into the program ##
 pieViewer = PieViewer()
-pieViewer.readFile("/home/pi/Airborne-Spray-Analysis/dummyDataset/sprayDataset.txt")
+#pieViewer.readFile("/home/pi/Airborne-Spray-Analysis/dummyDataset/sprayDataset.txt")
+pieViewer.readFile("C:/Users/jeans/PycharmProjects/OpenCVPython/Airborne-Spray-Analysis/dummyDataset/sprayDataset.txt")
