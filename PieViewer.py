@@ -25,6 +25,7 @@ class PieViewer:
 
         self.pieExplode = [0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0]
+        self.vmdValue = ""
 
     def getDictionary(self):
         return self.sprayDictionary
@@ -32,78 +33,85 @@ class PieViewer:
     def getLength(self):
         return len(self.sprayDictionary)
 
+
+    def updateSprayDictionary(self, formatedStringList):
+        self.sprayDictionary.update({"ultra coarse": int(formatedStringList[0])})
+        self.sprayDictionary.update({"extremely coarse": int(formatedStringList[1])})
+        self.sprayDictionary.update({"very coarse": int(formatedStringList[2])})
+        self.sprayDictionary.update({"coarse": int(formatedStringList[3])})
+        self.sprayDictionary.update({"medium": int(formatedStringList[4])})
+        self.sprayDictionary.update({"fine": int(formatedStringList[5])})
+        self.sprayDictionary.update({"very fine": int(formatedStringList[6])})
+        self.sprayDictionary.update({"extremely fine": int(formatedStringList[7])})
+        try:
+            self.vmdValue = formatedStringList[8].lower().strip()
+        except:
+            self.vmdValue = ""
+
     def updateExplodeList(self, vmd):
-        if vmd == "Ultra Coarse": # In microns
+        if vmd == "ultra coarse":  # In microns
             self.pieExplode = [0.12, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.0]
-        elif vmd == "Extremely Coarse":
+        elif vmd == "extremely coarse":
             self.pieExplode = [0.0, 0.12, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.0]
-        elif vmd == "Very Coarse":
+        elif vmd == "very coarse":
             self.pieExplode = [0.0, 0.0, 0.12, 0.0,
                                0.0, 0.0, 0.0, 0.0]
-        elif vmd == "Coarse":
+        elif vmd == "coarse":
             self.pieExplode = [0.0, 0.0, 0.0, 0.12,
                                0.0, 0.0, 0.0, 0.0]
-        elif vmd == "Medium":
+        elif vmd == "medium":
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.12, 0.0, 0.0, 0.0]
-        elif vmd == "Fine":
+        elif vmd == "fine":
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.0, 0.12, 0.0, 0.0]
-        elif vmd == "Very Fine":
+        elif vmd == "very fine":
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.12, 0.0]
-        else: # Extremely Fine
+        else:  # Extremely Fine
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.12]
         return self.pieExplode
 
+    def updatePieChart(self):
+        sprayDataset = np.array([self.sprayDictionary.get("ultra coarse"),
+                                 self.sprayDictionary.get("extremely coarse"),
+                                 self.sprayDictionary.get("very coarse"),
+                                 self.sprayDictionary.get("coarse"),
+                                 self.sprayDictionary.get("medium"),
+                                 self.sprayDictionary.get("fine"),
+                                 self.sprayDictionary.get("very fine"),
+                                 self.sprayDictionary.get("extremely fine")])
+        plt.rcParams["figure.figsize"] = (10, 5)
+        plt.title("$\\bf{Spray Quality}$")
+        self.updateExplodeList(self.vmdValue)
+        plt.pie(sprayDataset, labels=self.pieLabels, shadow=True, startangle=90,
+                colors=self.pieColors, autopct='%.0f%%', explode=self.pieExplode)
+        plt.legend(bbox_to_anchor=(1.05, 1.05), title="$\\bf{Legend}$", fontsize='medium',
+                   shadow=True)
+
+        plt.show(block=False)  # Allow for piechart window to be closed
+        plt.pause(.1)  # Update rate
+        plt.clf()  # Refresh pichart
+
+    # Function: Display the spray quality from a properly formated file
     def readFile(self, filePath):
         file = open(filePath)
         fileLine = file.readline()
         while fileLine:
             #print(fileLine, end='')
-            splitString = fileLine.split(" ")
-            self.sprayDictionary.update({"ultra coarse": int(splitString[0])})
-            self.sprayDictionary.update({"extremely coarse": int(splitString[1])})
-            self.sprayDictionary.update({"very coarse": int(splitString[2])})
-            self.sprayDictionary.update({"coarse": int(splitString[3])})
-            self.sprayDictionary.update({"medium": int(splitString[4])})
-            self.sprayDictionary.update({"fine": int(splitString[5])})
-            self.sprayDictionary.update({"very fine": int(splitString[6])})
-            self.sprayDictionary.update({"extremely fine": int(splitString[7])})
-            try:
-                vmdValue = splitString[8].strip()
-            except:
-                vmdValue = ""
+            formatedStringList = fileLine.split(" ")
+            self.updateSprayDictionary(formatedStringList)
             print(self.sprayDictionary)
             # Update the values read by the pie chart
-            sprayDataset = np.array([self.sprayDictionary.get("ultra coarse"),
-                                     self.sprayDictionary.get("extremely coarse"),
-                                     self.sprayDictionary.get("very coarse"),
-                                     self.sprayDictionary.get("coarse"),
-                                     self.sprayDictionary.get("medium"),
-                                     self.sprayDictionary.get("fine"),
-                                     self.sprayDictionary.get("very fine"),
-                                     self.sprayDictionary.get("extremely fine")])
-            fileLine = file.readline()
-            plt.rcParams["figure.figsize"] = (10, 5)
-            plt.title("$\\bf{Spray Quality}$")
-            self.updateExplodeList(vmdValue)
-            plt.pie(sprayDataset, labels = self.pieLabels, shadow = True, startangle = 90,
-                    colors = self.pieColors, autopct ='%.0f%%', explode = self.pieExplode )
-            plt.legend(bbox_to_anchor=(1.05, 1.05), title = "$\\bf{Legend}$", fontsize = 'medium',
-                       shadow = True)
-
-            plt.show(block=False)     # Allow for piechart window to be closed
-            plt.pause(.01)            # Update rate
-            plt.clf()                 # Refresh pichart
+            self.updatePieChart()
+            fileLine = file.readline() # Obtain the next line to read
         file.close
 
-
-
-## Entry point into the program ##
-pieViewer = PieViewer()
-#pieViewer.readFile("/home/pi/Airborne-Spray-Analysis/dummyDataset/sprayDataset.txt")
-pieViewer.readFile("C:/Users/jeans/PycharmProjects/OpenCVPython/Airborne-Spray-Analysis/dummyDataset/sprayDataset.txt")
+    # Function: Display the spray quality from a properly formated string
+    def displayFormatedList(self, formatedString):
+            formatedString.split(" ")
+            self.updateSprayDictionary(formatedString.split(" "))
+            self.updatePieChart()
