@@ -44,8 +44,10 @@ def updateSigma(value):
 def findContoursCanny(imgToDrawOn, inputImage):
     global pixelsPerIn
     global iteration
+    global imgBoundingBox
 
-    print("\niteration: " + str(iteration))
+    imgBoundingBox = imgToDrawOn.copy()
+    #print("\niteration: " + str(iteration))
     (contours, _) = cv2.findContours(inputImage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # Make the largest area (the US quarter) located at the first index
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
@@ -56,15 +58,35 @@ def findContoursCanny(imgToDrawOn, inputImage):
 
     for i in range(1, len(contours)):
         pixelArea = cv2.contourArea(contours[i])
+
+        # Identifying shape of a contour
+        arcLength = cv2.arcLength(contours[i], True)
+        # Approximates contour shape (since shapes can be irregular)
+        cornerPoints = cv2.approxPolyDP(contours[i], .01 * arcLength, True)
+        objectCorners = len(cornerPoints)
+
         # upper bound is 762 microns and the lower bound is 40 microns to remove noise
         upperBound = .03 * pixelsPerIn
         lowerBound = .0011 * pixelsPerIn
-        if (pixelArea > lowerBound and pixelArea < upperBound):
-            transferFunction = pixelArea / pixelsPerIn # Convert from pixel area into inches
-            #transferFunction = pixelArea / pixelsPerIn * IN_TO_MICRON
-            print("i=" + str(i) + ", Pixel area : " + str(cv2.contourArea(contours[i])) +
-                " Area in inches: " + str(transferFunction) +
-                " Area in microns: " + str(transferFunction * IN_TO_MICRON))
+
+        # Filter out shapes that are not a circle and other noise
+        if (pixelArea > lowerBound and pixelArea < upperBound and objectCorners > 4):
+            # Finding the area of each contour
+            transferFunction = pixelArea / pixelsPerIn * IN_TO_MICRON # Convert from pixel area into inches
+            #print("i=" + str(i) + ", Pixel area : " + str(cv2.contourArea(contours[i])) +
+            #    " Area in inches: " + str(transferFunction / IN_TO_MICRON) +
+            #    " Area in microns: " + str(transferFunction) +
+            #    " corner points: " + str(objectCorners))
+            cv2.drawContours(imgToDrawOn, contours, -1, (255, 0, 0), 4) # Draw all detected contours
+
+            # Draw bounding boxes with the area of each object
+            x, y, w, h = cv2.boundingRect(cornerPoints) # x cord, y, cord, width, and height
+            cv2.rectangle(imgBoundingBox, (x,y), (x+w, y+h), (0, 255, 0), 2)
+            areaString = "{area: .2f} um"
+            cv2.putText(imgBoundingBox, areaString.format(area = transferFunction),
+                    ( int(x + (w / 2) - 10), int(y + (h / 2) - 19)), cv2.FONT_HERSHEY_COMPLEX,
+                    0.5, (0, 0, 0), 0)
+
     cv2.drawContours(imgToDrawOn, contours, -1, (255, 0, 0), 4)
     iteration += 1
 
@@ -73,7 +95,7 @@ def cannyTrackbar():
     global gray
     global imgCanny
     global imgContourDraw
-    global imgContourDrawThre
+    global imgBoundingBox
     global sigma
 
     # Creating the trackbar
@@ -82,7 +104,7 @@ def cannyTrackbar():
     cv2.createTrackbar('maxval', "Canny Detection", maxValue, 400, updateMaxValue)
     cv2.createTrackbar('sigma', "Canny Detection", 0, 1, updateSigma)
     while (1):
-        imgStackCanny = imageFormater.stackImages(0.8, ([imgContourDraw, imgCanny]))
+        imgStackCanny = imageFormater.stackImages(0.8, ([imgContourDraw, imgCanny, imgBoundingBox]))
         cv2.imshow("Canny Detection", imgStackCanny)
         k = cv2.waitKey(1) & 0xFF  # window refresh rate in seconds
         if k == 27:  # If the escape key is pressed, end loop
@@ -102,12 +124,11 @@ imgCanny = cv2.Canny(GaussianBlur, minValue, maxValue)
 
 # Drawing contours
 imgContourDraw = img.copy()
+imgBoundingBox = None
 findContoursCanny(imgContourDraw, imgCanny)
 
-# Drawing bounding Box
-#imgBoundingBox = img.copy()
-#drawBoundingBox()
 
-imgStackCanny = imageFormater.stackImages(0.8, [imgContourDraw, imgCanny])
+
+imgStackCanny = imageFormater.stackImages(0.8, ([imgContourDraw, imgCanny, imgBoundingBox]))
 cannyTrackbar()
 cv2.destroyAllWindows()
