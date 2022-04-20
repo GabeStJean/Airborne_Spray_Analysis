@@ -1,9 +1,11 @@
-
 import cv2
 from PieViewer import PieViewer
 from ExtractSprayQuality import ExtractSprayQuality
-import time
 from ImageFormater import ImageFormater
+import time
+
+# This is the driver program for the Spray Quality monitor for informed pesticide
+# decisons.
 
 # Conversion
 US_QUARTER = .71 # in inches
@@ -17,7 +19,6 @@ imgDropletDraw = None
 imageFormater = ImageFormater()
 pieViewer = PieViewer()
 extractSprayQuality = ExtractSprayQuality()
-finishedAreaListFlag = False
 areaList = []
 
 def analyzePhoto():
@@ -26,7 +27,7 @@ def analyzePhoto():
 
     photoPath = "C:/Users/jeans/Documents/photos/"
 
-    for i in range(1, 10):
+    for i in range(1, 12):
         filePath = photoPath + "teststand{}.jpg".format(i)
         img = cv2.imread(filePath)
         dimension = (int(img.shape[1] * 9 / 100), int(img.shape[0] * 9 / 100))
@@ -40,16 +41,16 @@ def analyzePhoto():
 
         # Drawing contours
         imgDropletDraw = img.copy()
-        findContoursCanny(imgDropletDraw, imgCanny)
-        if len(areaList) == 0:
-            continue
+        findContoursCanny(imgCanny)
         cv2.imshow("Canny Detection", imgDropletDraw)
         formatedStr = extractSprayQuality.getFormatedString(areaList)
         pieViewer.displayFormatedList(formatedStr)
-        time.sleep(4.5)
+        k = cv2.waitKey(1) & 0xFF  # window refresh rate in seconds
+        if k == 27:  # If the escape key is pressed, end loop
+            break
         areaList.clear()
 
-def findContoursCanny(imgToDrawOn, inputImage):
+def findContoursCanny(inputImage):
     global pixelsPerIn
     global imgDropletDraw
     global areaList
@@ -63,17 +64,17 @@ def findContoursCanny(imgToDrawOn, inputImage):
         pixelsPerIn = cv2.contourArea(contours[0])/US_QUARTER
 
     # Shape Identification
-    for i in range(1, len(contours)):
-        pixelArea = cv2.contourArea(contours[i])
+    for i in range(1, len(contours)): # For each contour
+        pixelArea = cv2.contourArea(contours[i]) # Green's algorithim
         # Identifying shape of a contour
         arcLength = cv2.arcLength(contours[i], True)
         # Approximates contour shape (since shapes can be irregular)
         cornerPoints = cv2.approxPolyDP(contours[i], .01 * arcLength, True)
         objectCorners = len(cornerPoints)
 
-        # upper bound is 762 microns and the lower bound is 40 microns to remove noise
-        upperBound = .03 * pixelsPerIn
-        lowerBound = .0011 * pixelsPerIn
+        # upper bound is 1016 microns and the lower bound is 27 microns for droplet spectra
+        upperBound = .04 * pixelsPerIn   # .04 inches = 1016 microns
+        lowerBound = .0011 * pixelsPerIn # .0011 inches = 27 microns
 
         # Filter out shapes that are not a circle and other noise
         if (pixelArea > lowerBound and pixelArea < upperBound and objectCorners > 4):

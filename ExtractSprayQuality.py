@@ -90,6 +90,5 @@ class ExtractSprayQuality:
         for key in self.sprayDictionary:
             keyValueStr += str(self.sprayDictionary.get(key)) + " "
         keyValueStr += self.VMDvalue
-        print(keyValueStr)
         return keyValueStr.strip()
 
