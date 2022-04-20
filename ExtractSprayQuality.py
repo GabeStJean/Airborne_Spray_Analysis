@@ -55,7 +55,9 @@ class ExtractSprayQuality:
 
     def findVMD(self):
         arrayLength = len(self.areaList)
-        if (arrayLength % 2 == 2):
+        if arrayLength == 0:
+            self.classifyVMD(0)
+        elif (arrayLength % 2 == 2):
             self.classifyVMD(self.areaList[int(arrayLength/2)])
         else:
             self.classifyVMD(self.areaList[int(arrayLength/2) - 1])
@@ -88,5 +90,6 @@ class ExtractSprayQuality:
         for key in self.sprayDictionary:
             keyValueStr += str(self.sprayDictionary.get(key)) + " "
         keyValueStr += self.VMDvalue
+        print(keyValueStr)
         return keyValueStr.strip()
 
