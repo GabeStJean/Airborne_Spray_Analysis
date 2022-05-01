@@ -4,8 +4,9 @@ from ExtractSprayQuality import ExtractSprayQuality
 from ImageFormater import ImageFormater
 import time
 
-# This is the driver program for the Spray Quality monitor for informed pesticide
-# decisons.
+# This is the driver program for the Spray Quality monitor for informed pesticide decisions. This program will
+# analyze a series of photos with the canny edge detection algorithm to identify droplets and display
+# their distribution in the form of a pie chart.
 
 # Conversion
 US_QUARTER = .71 # in inches
@@ -21,23 +22,31 @@ pieViewer = PieViewer()
 extractSprayQuality = ExtractSprayQuality()
 areaList = []
 
+# Function: Performs canny contour detection to identify spray droplets on aseries of pre captured images and displays
+#           the spray quality alongside the images
+# Postcondition: The spray quality is shown to the user in the form of a pie chart while
 def analyzePhoto():
     global areaList
     global imgDropletDraw
+    global pixelsPerIn
 
     photoPath = "C:/Users/jeans/Documents/photos/"
 
-    for i in range(1, 12):
-        filePath = photoPath + "teststand{}.jpg".format(i)
+    count = 1
+    while True:
+        if (count > 10):
+            count = 1
+
+        filePath = photoPath + "teststand{}.jpg".format(count)
         img = cv2.imread(filePath)
         dimension = (int(img.shape[1] * 9 / 100), int(img.shape[0] * 9 / 100))
         img = cv2.resize(img, dimension, interpolation=cv2.INTER_AREA)
         print(filePath)
 
         # Canny Edge Detection
-        gray = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2GRAY)  # Needed to turn imag
+        gray = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2GRAY)  # Needed to turn image gray
         GaussianBlur = cv2.GaussianBlur(gray, (5, 5), 0)  # To remove noise and imp
-        imgCanny = cv2.Canny(GaussianBlur, 63, 69)
+        imgCanny = cv2.Canny(GaussianBlur, 42, 40)
 
         # Drawing contours
         imgDropletDraw = img.copy()
@@ -48,7 +57,10 @@ def analyzePhoto():
         k = cv2.waitKey(1) & 0xFF  # window refresh rate in seconds
         if k == 27:  # If the escape key is pressed, end loop
             break
+        count += 1
+        pixelsPerIn = -1
         areaList.clear()
+        time.sleep(1)
 
 def findContoursCanny(inputImage):
     global pixelsPerIn
@@ -85,9 +97,9 @@ def findContoursCanny(inputImage):
             x, y, w, h = cv2.boundingRect(cornerPoints) # x cord, y, cord, width, and height
             cv2.rectangle(imgDropletDraw, (x,y), (x+w, y+h), (0, 255, 0), 2)
             areaString = "{area: .2f} um"
-            cv2.putText(imgDropletDraw, areaString.format(area = transferFunction),
-                    (int(x + (w / 2) - 10), int(y + (h / 2) - 19)),
-                    cv2.FONT_HERSHEY_COMPLEX,0.5, (0, 0, 0), 0)
+            #cv2.putText(imgDropletDraw, areaString.format(area = transferFunction),
+            #       (int(x + (w / 2) - 10), int(y + (h / 2) - 19)),
+            #       cv2.FONT_HERSHEY_COMPLEX,0.5, (0, 0, 0), 0)
 
 ## Entry point into the program
 analyzePhoto()
