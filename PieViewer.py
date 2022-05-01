@@ -2,11 +2,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-# This class serves as a proof of concept for the visual component of the design
+# This class creates a pie chart that will be used to visualize the spray quality of a pesticide
+# spray application. The spray quality for this application contains the ratio of droplet size
+# classification for measured particles and the Volume Metric Median Diameter (VMD) value of the
+# dataset. The VMD value of the dataset is represented as an exploded pie piece on the chart.
+#
+# The program contains a function to display a correctly formatted string  containing the spray
+# quality, and a function to interpret a file containing values pertaining to spray quality.
+# A exploding pie piece within the chart will be used to denote the VMD value of the application.
+#
+# A correctly formatted string for this program is as follows:
+# "UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD"
+#
+# Within the correctly formatted string, the VMD value is optional and no pie piece will be exploded
+# if ommitted.
 
 class PieViewer:
 
+    # Function: The constructor of the class.
     def __init__(self):
+        self.debugMode = False
         self.sprayDictionary = {"ultra coarse" : 0,
                                 "extremely coarse" : 0,
                                 "very coarse" : 0,
@@ -27,13 +42,15 @@ class PieViewer:
             0.0, 0.0, 0.0, 0.0]
         self.vmdValue = ""
 
+    # Function: Retrieves the spray dictionary.
     def getDictionary(self):
         return self.sprayDictionary
 
+    # Function: Returns the length of the spray dictionary.
     def getLength(self):
         return len(self.sprayDictionary)
 
-
+    # Function: Updates the `sprayDictionary` variable from a properly formatted string.
     def updateSprayDictionary(self, formatedStringList):
         self.sprayDictionary.update({"ultra coarse": int(formatedStringList[0])})
         self.sprayDictionary.update({"extremely coarse": int(formatedStringList[1])})
@@ -48,6 +65,7 @@ class PieViewer:
         except:
             self.vmdValue = ""
 
+    # Function: Denotes the VMD value of the spray quality as an explodeded pie piece.
     def updateExplodeList(self, vmd):
         if vmd == "ultra coarse":  # In microns
             self.pieExplode = [0.12, 0.0, 0.0, 0.0,
@@ -70,12 +88,17 @@ class PieViewer:
         elif vmd == "very fine":
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.12, 0.0]
-        else:  # Extremely Fine
+        elif vmd == "extremely fine":
             self.pieExplode = [0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.12]
+        else:
+            [0.0, 0.0, 0.0, 0.0,
+             0.0, 0.0, 0.0, 0.0]
         return self.pieExplode
 
-    def updatePieChart(self):
+    # Function: Updates the piechart with the values obtained from `sprayDictionary`.
+    # Postcondition: A piechart is updated for the user on the screen.
+    def updatePieChart(self, windowWidth = 9, windowLength = 5):
         sprayDataset = np.array([self.sprayDictionary.get("ultra coarse"),
                                  self.sprayDictionary.get("extremely coarse"),
                                  self.sprayDictionary.get("very coarse"),
@@ -84,7 +107,8 @@ class PieViewer:
                                  self.sprayDictionary.get("fine"),
                                  self.sprayDictionary.get("very fine"),
                                  self.sprayDictionary.get("extremely fine")])
-        plt.rcParams["figure.figsize"] = (10, 5)
+
+        plt.rcParams["figure.figsize"] = (windowWidth, windowLength)
         plt.title("$\\bf{Spray Quality}$")
         self.updateExplodeList(self.vmdValue)
         plt.pie(sprayDataset, labels=self.pieLabels, shadow=True, startangle=90,
@@ -96,22 +120,30 @@ class PieViewer:
         plt.pause(.1)  # Update rate
         plt.clf()  # Refresh pichart
 
-    # Function: Display the spray quality from a properly formated file
+    # Function: Displays the spray quality from a properly formatted file
+    # Precondition: The file path exists.
+    # Postcondition: A pie chart that changes in realtime from values parsed through a file
+    #                is outputted to the screen.
     def readFile(self, filePath):
         file = open(filePath)
         fileLine = file.readline()
         while fileLine:
-            #print(fileLine, end='')
-            formatedStringList = fileLine.split(" ")
-            self.updateSprayDictionary(formatedStringList)
-            print(self.sprayDictionary)
-            # Update the values read by the pie chart
-            self.updatePieChart()
-            fileLine = file.readline() # Obtain the next line to read
+            if (self.debugMode == True):
+                print(fileLine, end='')
+            if (fileLine == "\n" or fileLine.split()[0] == "#"):
+                fileLine = file.readline()  # Obtain the next line to be read
+            else:
+                formatedStringList = fileLine.split(" ")
+                self.updateSprayDictionary(formatedStringList)
+                # Update the values read by the pie chart
+                self.updatePieChart()
+            fileLine = file.readline() # Obtain the next line to be read
         file.close
 
-    # Function: Display the spray quality from a properly formated string
-    def displayFormatedList(self, formatedString):
+    # Function: Display the spray quality from a properly formatted string
+    #
+    # @param formatted String contains the number of particle types and the VMD classification
+    def displayFormatedList(self, formatedString, windowWidth = 9, windowLength = 5):
             formatedString.split(" ")
             self.updateSprayDictionary(formatedString.split(" "))
-            self.updatePieChart()
+            self.updatePieChart(windowWidth, windowLength)

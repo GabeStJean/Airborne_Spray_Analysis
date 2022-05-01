@@ -1,7 +1,19 @@
-
+# This class is used to obtain a correctly formatted string containing the spray quality of
+# of a dataset of droplet measurments. This is accomplished by classifying the value of each
+# measured particle value in the dataset and then creates a formatted string that contains
+# the number of each classified droplet. The program also classifies the Volume Metreic Median
+# Diamaeter (VMD) of the dataset and appends it to the string.
+#
+# Droplet classification is based on the classification used to identify droplets in pesticide
+# spray applications which are fine, medium, coarse, and etc.
+#
+#
+# A correctly formatted string for this program is as follows:
+# "UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD"
 
 class ExtractSprayQuality:
 
+    # Function: The constructor of the class.
     def __init__(self):
         self.areaList = [0]
         self.sprayDictionary = {"ultra coarse": 0,
@@ -13,8 +25,8 @@ class ExtractSprayQuality:
                                 "very fine": 0,
                                 "extremely fine": 0}
         self.VMDvalue = ""
-        self.file = open("sprayQualityDataset.txt", "w")
 
+    # Function: Clears the spray dictionary to default values.
     def clearSprayDictionaryToDefault(self):
         self.sprayDictionary = {"ultra coarse": 0,
                                 "extremely coarse": 0,
@@ -25,6 +37,13 @@ class ExtractSprayQuality:
                                 "very fine": 0,
                                 "extremely fine": 0}
 
+    # Function: Populates a dictionary containing the number of droplet types based on
+    #           the values within `areaList`.
+    # Precondition: The values within `areaList` are in microns.
+    # Postcondition: The sprayDictionary` variable contains the number of droplets present
+    #                within `areaList`.
+    #
+    # Complexity: O(N)
     def updateSprayDictionary(self):
         self.clearSprayDictionaryToDefault()
         for area in self.areaList:
@@ -53,6 +72,9 @@ class ExtractSprayQuality:
                 keyValue = self.sprayDictionary.get("extremely fine")
                 self.sprayDictionary.update({"extremely fine": keyValue + 1})
 
+    # Function: Obtains the median value of a list of numbers
+    # Precondtion: The list is sorted
+    # Postcondition: The VMD value of the list is found
     def findVMD(self):
         arrayLength = len(self.areaList)
         if arrayLength == 0:
@@ -62,6 +84,7 @@ class ExtractSprayQuality:
         else:
             self.classifyVMD(self.areaList[int(arrayLength/2) - 1])
 
+    # Function: Obtains the VMD classification based on a micron measurement.
     def classifyVMD(self, area):
             if area > 650: # In microns
                 self.VMDvalue = "ultra coarse"
@@ -80,7 +103,11 @@ class ExtractSprayQuality:
             else:
                 self.VMDvalue = "extremely fine"
 
-
+    # Function: Produces a formatted string containing the spray quality of a list of
+    #           the area of spray droplets.
+    # Precondition: Values in the area list are in microns
+    #
+    # @param areaList - a list containing the micron measurement of spray particles
     def getFormatedString(self, areaList):
         self.areaList = areaList.copy()  # For finding VMD
         self.areaList.sort()
@@ -91,4 +118,3 @@ class ExtractSprayQuality:
             keyValueStr += str(self.sprayDictionary.get(key)) + " "
         keyValueStr += self.VMDvalue
         return keyValueStr.strip()
-
