@@ -1,5 +1,5 @@
 import cv2
-from ImageFormater import ImageFormater
+from ImageFormatter import ImageFormatter
 import time
 
 # This program adds a trackbar to find the optimal parameters for the binary
@@ -76,7 +76,7 @@ _, imgBinary = cv2.threshold(grayInverted, thresh, maxval, cv2.THRESH_BINARY)
 # finding contours
 imgThreshContourDraw = img.copy()
 findContoursThreshold()
-imageFormater = ImageFormater()
-imgStackThresh = imageFormater.stackImages(0.8, ([imgThreshContourDraw, imgBinary]))
+imageFormatter = ImageFormatter()
+imgStackThresh = imageFormatter.stackImages(0.8, ([imgThreshContourDraw, imgBinary]))
 thresholdTrackbar()
 cv2.destroyAllWindows()

@@ -65,7 +65,7 @@ class PieViewer:
         except:
             self.vmdValue = ""
 
-    # Function: Denotes the VMD value of the spray quality as an explodeded pie piece.
+    # Function: Denotes the VMD value of the spray quality as an exploded pie piece.
     def updateExplodeList(self, vmd):
         if vmd == "ultra coarse":  # In microns
             self.pieExplode = [0.12, 0.0, 0.0, 0.0,

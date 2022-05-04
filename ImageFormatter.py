@@ -3,13 +3,16 @@ import numpy as np
 
 # Program courtesy of Murtaza's Workshop - Robotics and AI
 
-class ImageFormater:
+class ImageFormatter:
 
-    # Function: The constructor of the class
+    # Function: The constructor of the class.
     def __init__(self):
         pass
+
     # Function: Allows multiples images to be stacked together horizontally and vertically with the
     #           cv.imshow() function.
+    # @param scale - The scale of each image in `imgArray`.
+    # @param imgArray - A array of images.
     def stackImages(self, scale, imgArray):
         rows = len(imgArray)
         cols = len(imgArray[0])

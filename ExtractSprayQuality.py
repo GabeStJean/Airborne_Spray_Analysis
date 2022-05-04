@@ -1,12 +1,11 @@
-# This class is used to obtain a correctly formatted string containing the spray quality of
-# of a dataset of droplet measurments. This is accomplished by classifying the value of each
+# This class is used to obtain a correctly formatted string containing the spray quality
+# of a dataset of droplet measurements. This is accomplished by classifying the value of each
 # measured particle value in the dataset and then creates a formatted string that contains
-# the number of each classified droplet. The program also classifies the Volume Metreic Median
-# Diamaeter (VMD) of the dataset and appends it to the string.
+# the number of each classified droplet. The program also classifies the Volume Metric Median
+# Diameter (VMD) of the dataset and appends it to the string.
 #
 # Droplet classification is based on the classification used to identify droplets in pesticide
 # spray applications which are fine, medium, coarse, and etc.
-#
 #
 # A correctly formatted string for this program is as follows:
 # "UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD"
@@ -72,9 +71,9 @@ class ExtractSprayQuality:
                 keyValue = self.sprayDictionary.get("extremely fine")
                 self.sprayDictionary.update({"extremely fine": keyValue + 1})
 
-    # Function: Obtains the median value of a list of numbers
-    # Precondtion: The list is sorted
-    # Postcondition: The VMD value of the list is found
+    # Function: Obtains the median value of a list of numbers.
+    # Precondtion: The list is sorted.
+    # Postcondition: The VMD value of the list is found.
     def findVMD(self):
         arrayLength = len(self.areaList)
         if arrayLength == 0:
@@ -105,9 +104,9 @@ class ExtractSprayQuality:
 
     # Function: Produces a formatted string containing the spray quality of a list of
     #           the area of spray droplets.
-    # Precondition: Values in the area list are in microns
+    # Precondition: Values in the area list are in microns.
     #
-    # @param areaList - a list containing the micron measurement of spray particles
+    # @param areaList - a list containing the micron measurement of spray particles.
     def getFormatedString(self, areaList):
         self.areaList = areaList.copy()  # For finding VMD
         self.areaList.sort()

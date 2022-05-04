@@ -1,10 +1,19 @@
 import random
 from datetime import date
 import time
+
 # This program generates a dummy dataset of the amount of the distribution of the various
 # types of pesticide spray particles.
+#
+# A correctly formatted string for this program is as follows:
+# "UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD"
+#
+# Within the correctly formatted string, the VMD value is optional and no pie piece will be exploded
+# if omitted.
 
 class GenerateSprayDataset:
+
+    # Function: Constructor of the program.
     def __init__(self, initial):
         self.sprayDictionary = {"ultra coarse" : self.randomIncrement(initial),
                                    "extremely coarse" : self.randomIncrement(initial),
@@ -15,8 +24,8 @@ class GenerateSprayDataset:
                                    "very fine" : self.randomIncrement(initial),
                                    "extremely fine" : self.randomIncrement(initial)}
 
-    # Function: adds a random number to increment/decrement the current value of
-    #           a pesticide spray distribution
+    # Function: Adds a random number to increment/decrement the current value of
+    #           a pesticide spray distribution.
     def randomIncrement(self, start):
         randNumPos = random.randint(0, 10)
         randNumNeg = random.randint(0, 10)
@@ -27,7 +36,7 @@ class GenerateSprayDataset:
         else:
             return start - randNumNeg
 
-    # Function: Updates all values in the pesticide dataset by arbitray increments
+    # Function: Updates all values in the pesticide dataset by arbitrary increments.
     def randomUpdateDictionary(self):
         for key in self.sprayDictionary:
             keyValue = self.sprayDictionary.get(key)
@@ -51,8 +60,8 @@ generateSprayDataset = GenerateSprayDataset(30)
 t = time.localtime()
 currentTime = time.strftime("%H:%M:%S", t)
 file = open("../sprayDataset.txt", "w")
-file.write("# File format: UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD\n"
-           + "#\n# File produced on " + str(date.today()) + " @ " + str(currentTime) + " by GenerateDummySprayDataset.py"+ "\n\n")
+file.write("# File format: \"UltraCoarse ExtremelyCoarse VeryCoarse Medium Fine VeryFine ExtremelyFine VMD\".\n"
+           + "# VMD is optional.\n# File produced on " + str(date.today()) + " @ " + str(currentTime) + " by GenerateDummySprayDataset.py."+ "\n\n")
 for i in range(30):
     generateSprayDataset.randomUpdateDictionary()
     file.write(generateSprayDataset.getStrRep() + "\n")

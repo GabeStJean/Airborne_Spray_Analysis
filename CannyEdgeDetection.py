@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from PieViewer import PieViewer
 from ExtractSprayQuality import ExtractSprayQuality
-import time
+from ImageFormatter import ImageFormatter
 
 # This class uses the Canny Edge Detection map to identify water droplets in an image to produce a new image
 # that contains bounding boxes or contours around them. Water droplets are then classified into spray particle
@@ -43,7 +43,6 @@ class CannyEdgeDetection:
 
     # Function: Constructor of the class
     def __init__(self, dilateAndErodeImage, showImgMeasurement, showPieViewer, showContourLen, showDebugOutput):
-
         self.dilateAndErodeImage = dilateAndErodeImage
         self.showImgMeasurement = showImgMeasurement
         self.showPieViewer = showPieViewer
@@ -64,6 +63,7 @@ class CannyEdgeDetection:
         self.pieViewer = PieViewer()
         self.areaList = []  # Contains the micron measurement of contours that fit a criteria
         self.pixelsPerIn = -1
+        self.imageFormatter = ImageFormatter()
 
     # Function: Modifies the dimensions of the pie chart window.
     #
@@ -76,8 +76,8 @@ class CannyEdgeDetection:
         pieViewerWidth = width
         pieViewerHeight = height
 
-    # Function: Creates a spray quality pie chart based on the values within `areaList`
-    # Precondition: The boolean class variable `showPieViewer` is enabled
+    # Function: Creates a spray quality pie chart based on the values within `areaList`.
+    # Precondition: The boolean class variable `showPieViewer` is enabled.
     def viewPieChart(self):
         global pieViewerWidth
         global pieViewerHeight
@@ -179,5 +179,4 @@ class CannyEdgeDetection:
                         (int(self.imgContourMap.shape[0] - self.imgContourMap.shape[0] / 1.05),
                          int(self.imgContourMap.shape[1] - self.imgContourMap.shape[1] / 2.7)),
                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 100), 0)
-
         cv2.drawContours(self.imgContourDraw, contours, -1, (255, 0, 0), 4)  # Draw all contours
