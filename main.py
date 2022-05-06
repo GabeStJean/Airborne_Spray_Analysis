@@ -16,7 +16,7 @@ videoPath = "C:/Users/jeans/Documents/Videos/manPunching.mp4"
 
 dilateAndErodeImage = False
 showImgMeasurement = False
-showPieViewer = False
+showPieViewer = True
 showContourLen = False
 showDebugOutput = False
 
@@ -85,6 +85,6 @@ class SprayQualityDriver(CannyEdgeDetection):
 
 ## Entry point into the program ##
 sprayQualityDriver = SprayQualityDriver()
-sprayQualityDriver.analyzeVideo()
-#sprayQualityDriver.analyzePhotos()
+#sprayQualityDriver.analyzeVideo()
+sprayQualityDriver.analyzePhotos()
 cv2.destroyAllWindows()

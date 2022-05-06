@@ -15,8 +15,8 @@ onto a boom sprayer.
 <p align="center">
     <img src="resources/other/SprayQuality.jpg">
 
-[Abstract](./resources/other/Abstract.docx.pdf) <br>
-[Poster](./resources/other/ShowcasePoster.pptx.pdf) <br>
+[Abstract](./resources/other/AbstractSprayQualityMonitor.pdf) <br>
+[Poster](./resources/other/ShowcasePoster.pdf) <br>
 [Video](https://youtu.be/II_L44RcShs)
 
 In this program's setup, the program analyzes the spray quality of a series of [pre-captured
